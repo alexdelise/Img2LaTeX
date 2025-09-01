@@ -21,9 +21,15 @@ The encoder processes grayscale formula images into a sequence of embeddings.
    stacked layers increase channels from 1 → 64 → 128 → 256 → $d_{model}$.
 
 2. **Positional Encoding**:  
-   A 2D sinusoidal encoding injects spatial information:  
-   $PE_{x,y}(i) =\begin{cases}\sin(x / 10000^{2i/d}), & i \text{ even} \\\cos(x / 10000^{2i/d}), & i \text{ odd}\end{cases}$
-   Similarly for $y$, then concatenated.
+  A 2D sinusoidal encoding injects spatial information.  
+   For the $x$-coordinate, even indices use sine and odd indices use cosine:  
+   
+   $PE_{x,y}^{\text{even}}(i) = \sin\!\left(\frac{x}{10000^{2i/d}}\right)$  
+   
+   $PE_{x,y}^{\text{odd}}(i) = \cos\!\left(\frac{x}{10000^{2i/d}}\right)$  
+   
+   The same construction is applied for $y$, and the results are concatenated.
+
 
 3. **Flattening**: The feature map is reshaped into a sequence suitable for the decoder.
 
