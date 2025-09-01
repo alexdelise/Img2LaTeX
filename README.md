@@ -17,9 +17,7 @@ This repository provides:
 The encoder processes grayscale formula images into a sequence of embeddings.
 
 1. **Convolutions**:  
-   $
-      f = \text{ReLU}(\text{Conv2D}(x))
-   $ 
+   $$f = \text{ReLU}(\text{Conv2D}(x))$$
    stacked layers increase channels from 1 → 64 → 128 → 256 → $d_{model}$.
 
 2. **Positional Encoding**:  
