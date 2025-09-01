@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+.venv/
+.env
+.ipynb_checkpoints/
+
+
+# Data & artifacts (NEVER COMMIT)
+data/
+datasets/
+downloads/
+corpora/
+images_raw/
+renders/
+outputs/
+runs/
+wandb/
+checkpoints/
+models/
+*.pt
+*.pth
+*.bin
+*.npz
+*.npy
+*.lmdb
+*.tar
+*.zip
+
+
+# Logs
+logs/
+*.log
+
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.pdf
+*.dvi
+*.synctex.gz
+
+
+# OS
+.DS_Store
+Thumbs.db
