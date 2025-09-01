@@ -22,13 +22,7 @@ The encoder processes grayscale formula images into a sequence of embeddings.
 
 2. **Positional Encoding**:  
    A 2D sinusoidal encoding injects spatial information:  
-   $
-      PE_{x,y}(i) =
-      \begin{cases}
-         \sin(x / 10000^{2i/d}), & i \text{ even} \\
-         \cos(x / 10000^{2i/d}), & i \text{ odd}
-      \end{cases}
-   $
+   $PE_{x,y}(i) =\begin{cases}\sin(x / 10000^{2i/d}), & i \text{ even} \\\cos(x / 10000^{2i/d}), & i \text{ odd}\end{cases}$
    Similarly for $y$, then concatenated.
 
 3. **Flattening**: The feature map is reshaped into a sequence suitable for the decoder.
@@ -41,25 +35,19 @@ The decoder is a Transformer with $N$ stacked layers:
 - Position-wise feed-forward layers
 
 The input is token embeddings plus positional encodings:  
-$
-   h = \text{TransformerDecoder}(y_{in}, \text{mem})
-$
+$h = \text{TransformerDecoder}(y_{in}, \text{mem})$
 The final logits are projected into the vocabulary space.
 
 ### Loss Function: Label Smoothed Cross-Entropy
 
 To prevent overfitting and encourage generalization, we use label smoothing:  
-$
-   \mathcal{L} = (1-\epsilon) \cdot \text{CE}(y, \hat{y}) + \epsilon \cdot U
-$
+$\mathcal{L} = (1-\epsilon) \cdot \text{CE}(y, \hat{y}) + \epsilon \cdot U$
 where $U$ is the uniform distribution loss and $\epsilon = 0.1$.
 
 ### Decoding: Beam Search
 
 Instead of greedy decoding, predictions are generated using **beam search**. At each step, we keep the top-$k$ candidate sequences:  
-$
-`   \text{score}(y) = \frac{1}{|y|^\alpha} \sum_{t=1}^{|y|} \log p(y_t | y_{<t}, x)
-$ 
+$\text{score}(y) = \frac{1}{|y|^\alpha} \sum_{t=1}^{|y|} \log p(y_t | y_{<t}, x)$ 
 with length normalization parameter $\alpha = 0.8$.
 
 This balances fluency and sequence length.
