@@ -2,7 +2,7 @@
 
 ## Overview
 
-Img2LaTeX is a deep learning system that converts mathematical expressions from images into LaTeX markup. It is built using **PyTorch**, **Albumentations**, and **SentencePiece**, and trained on the **Im2Latex-100k** dataset. The pipeline involves preprocessing images, tokenizing LaTeX code, training a CNN–Transformer architecture, and decoding predictions via beam search.
+Img2LaTeX is a deep learning system that converts mathematical expressions from images into LaTeX markup. It is built using **PyTorch**, **SQL**, **Albumentations**, and **SentencePiece**, and trained on the **Im2Latex-100k** dataset. The pipeline involves preprocessing images, tokenizing LaTeX code, training a CNN–Transformer architecture, and decoding predictions via beam search.
 
 This repository provides:
 - Scripts to download and preprocess datasets into a SQLite database.
