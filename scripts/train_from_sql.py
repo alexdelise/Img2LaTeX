@@ -10,9 +10,13 @@ def set_seed(s=42):
     torch.manual_seed(s); torch.cuda.manual_seed_all(s)
 
 def main():
-    cfg={"db":"data/im2latex.db","spm":"data/spm/latex_sp.model","H":128,"Tmax":256,
-         "model":{"dModel":512,"nHeads":8,"nLayers":6},
-         "optim":{"lr":3e-4,"wd":1e-2,"batch":32,"epochs":30,"clip":1.0}}
+    cfg = {
+        "db":"data/im2latex.db",
+        "spm":"data/spm/latex_sp.model",
+        "H":128, "Tmax":256,
+        "model":{"d_model":512,"nhead":8,"nlayers":6},
+        "optim":{"lr":3e-4,"wd":1e-2,"batch":32,"epochs":30,"clip":1.0}
+    }
     set_seed(42); device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ds_tr=Im2LatexSQL(cfg["db"],"train",cfg["spm"],cfg["H"],cfg["Tmax"],train=True)
