@@ -48,7 +48,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     img_path = sys.argv[1]
-    H = 128
+    H = 192
     spm = "data/spm/latex_sp.model"
     ckpt = "checkpoints/best_sql.pt"
 
