@@ -24,9 +24,9 @@ The encoder processes grayscale formula images into a sequence of embeddings.
   A 2D sinusoidal encoding injects spatial information.  
    For the $x$-coordinate, even indices use sine and odd indices use cosine:  
    
-   $PE_{x,y}^{\text{even}}(i) = \sin\!\left(\frac{x}{10000^{2i/d}}\right)$  
+   $PE_{x,y}^{\text{even}}(i) = \sin \left(\frac{x}{10000^{2i/d}}\right)$  
    
-   $PE_{x,y}^{\text{odd}}(i) = \cos\!\left(\frac{x}{10000^{2i/d}}\right)$  
+   $PE_{x,y}^{\text{odd}}(i) = \cos \left(\frac{x}{10000^{2i/d}}\right)$  
    
    The same construction is applied for $y$, and the results are concatenated.
 
