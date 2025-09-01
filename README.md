@@ -52,7 +52,7 @@ where $U$ is the uniform distribution loss and $\epsilon = 0.1$.
 
 ### Decoding: Beam Search
 
-Instead of greedy decoding, predictions are generated using **beam search**. At each step, we keep the top-$k$ candidate sequences:  
+Instead of greedy decoding, predictions are generated using **beam search**. At each step, we keep the top - $k$ candidate sequences:  
 $\text{score}(y) = \frac{1}{|y|^\alpha} \sum_{t=1}^{|y|} \log p(y_t | y_{<t}, x)$ 
 with length normalization parameter $\alpha = 0.8$.
 
