@@ -26,12 +26,21 @@ def beam_search(model, x, bos_id=1, eos_id=2, beam=5, max_len=256, alpha=0.8):
     return max(beams, key=lambda p: p[1] / (len(p[0]) ** alpha))[0]
 
 def render_preview(tex, out_path="outputs/pred_preview.png"):
-    import matplotlib.pyplot as plt, os
+    import matplotlib.pyplot as plt, os, pathlib
     os.makedirs("outputs", exist_ok=True)
-    plt.figure(); plt.axis("off")
-    plt.text(0.05,0.5,f"${tex}$",fontsize=28,va="center")
-    plt.savefig(out_path, bbox_inches="tight", pad_inches=0.1); plt.close()
-    print("Saved preview:", out_path)
+    try:
+        plt.figure(); plt.axis("off")
+        plt.text(0.05, 0.5, f"${tex}$", fontsize=28, va="center")
+        plt.savefig(out_path, bbox_inches="tight", pad_inches=0.1)
+        plt.close()
+        print("Saved preview:", out_path)
+    except Exception as e:
+        # Fallback: write TeX to a .txt file so the script never crashes
+        txt_path = pathlib.Path(out_path).with_suffix(".txt")
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write(tex)
+        print("Preview failed; wrote LaTeX to:", txt_path, "| Error:", e)
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -50,7 +59,11 @@ if __name__ == "__main__":
 
     tfms = make_transforms(H, train=False)
     arr = np.array(Image.open(img_path).convert("L"))
-    x = tfms(image=arr)["image"].unsqueeze(0)
+    x = tfms(image=arr)["image"]
+    # ensure float in [0,1] so it matches model weights
+    if x.dtype != torch.float32:
+        x = x.float().div(255.0)
+    x = x.unsqueeze(0)
     ids = beam_search(model, x, bos_id=1, eos_id=2, beam=5)
     pred = tk.decode(ids)
 

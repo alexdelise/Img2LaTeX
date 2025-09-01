@@ -14,11 +14,11 @@ def make_transforms(H: int, train: bool=False):
     aug = []
     if train:
         aug += [
-            A.GaussNoise(var_limit=(0.0,10.0), p=0.15),
-            A.RandomBrightnessContrast(0.05,0.05,p=0.15)
+            A.GaussNoise(var_limit=(0.0, 10.0), p=0.15),
+            A.RandomBrightnessContrast(0.05, 0.05, p=0.15),
         ]
     return A.Compose([
-        A.ToGray(always_apply=True),
+        A.ToGray(p=1.0),  # images are already gray; p=1 avoids warnings
         A.LongestMaxSize(max_size=H, interpolation=1),
         A.PadIfNeeded(min_height=H, min_width=H, border_mode=0, value=255),
         *aug,
@@ -41,7 +41,7 @@ class LatexTokenizer:
         return ids
 
     def decode(self, ids):
-        ids = [i for i in ids if i not in (self.bos_id,self.eos_id,self.pad_id)]
+        ids = [i for i in ids if i not in (self.bos_id, self.eos_id, self.pad_id)]
         return self.sp.decode(ids)
 
     @property
@@ -71,6 +71,9 @@ class Im2LatexSQL(Dataset):
         path, tex = self.rows[i]
         arr = np.array(Image.open(path).convert("L"))
         x = self.tfms(image=arr)["image"]     # [1,H,W]
+        # Ensure float in [0,1] to match AMP half/float math
+        if x.dtype != torch.float32:
+            x = x.float().div(255.0)
         y = torch.tensor(self.tk.encode(tex)[:self.max_len], dtype=torch.long)
         return x, y, path, tex
 

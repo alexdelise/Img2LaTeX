@@ -49,7 +49,7 @@ if __name__ == "__main__":
     spm = "data/spm/latex_sp.model"
     ckpt = "checkpoints/best_sql.pt"
     split = "val"
-    N = 500  # evaluate first 500 samples for speed
+    N = 10  # evaluate first 10 samples for speed
 
     ds = Im2LatexSQL(db, split, spm, 128, 256, train=False)
     tk = ds.tk
@@ -57,9 +57,11 @@ if __name__ == "__main__":
     state = torch.load(ckpt, map_location="cpu")
     model.load_state_dict(state["model"])
 
+    from tqdm.auto import tqdm
+
     total, exact, dsum = 0, 0, 0
     rows = []
-    for i in range(min(N, len(ds))):
+    for i in tqdm(range(min(N, len(ds))), desc=f"Evaluating {split}", unit="sample"):
         x, y_true, path, gt = ds[i]
         ids = beam_search(model, x.unsqueeze(0), bos_id=1, eos_id=2)
         pred = tk.decode(ids)

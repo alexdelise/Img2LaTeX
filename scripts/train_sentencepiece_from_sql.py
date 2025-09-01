@@ -14,9 +14,9 @@ def main():
     corpus = out/"corpus.txt"
 
     con = sqlite3.connect(args.db_path)
-    with open(corpus,"w",encoding="utf-8") as f:
-        for (latex,) in con.execute("SELECT latex FROM formulas"):
-            f.write(latex+"\n")
+    with open(corpus, "w", encoding="utf-8") as f:
+        for (latex,) in con.execute("SELECT latex FROM samples"):
+            f.write(latex + "\n")
     con.close()
 
     spm.SentencePieceTrainer.Train(
