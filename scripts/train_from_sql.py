@@ -11,12 +11,12 @@ def set_seed(s=42):
 
 def main():
     cfg = {
-        "db":   "data/im2latex.db",
-        "spm":  "data/spm/latex_sp.model",
-        "H":    196,
-        "Tmax": 256,
-        "model": {"d_model": 512, "nhead": 8, "nlayers": 6},
-        "optim": {"lr": 3e-4, "wd": 1e-2, "batch": 32, "epochs": 30, "clip": 1.0},
+        "db":"data/im2latex.db",
+        "spm":"data/spm/latex_sp.model",
+        "H":196, "Tmax":256,   # 256 is fine for typical formulas
+        "model":{"d_model":768,"nhead":12,"nlayers":8, "dim_feedforward":3072, "dropout":0.1},
+        # Larger model → reduce batch; keep LR unless you observe instability
+        "optim":{"lr":3e-4,"wd":1e-2,"batch":16,"epochs":30,"clip":1.0},
         # training control
         "sched": {"warmup_frac": 0.05},   # 5% warmup, cosine decay
         "early_stop": {"patience": 5}

@@ -36,13 +36,46 @@ class TransformerDecoder(nn.Module):
         h=self.dec(tgt,mem,tgt_mask=mask)
         return self.proj(h).transpose(0,1)
 
-class Im2Latex(nn.Module):
-    def __init__(self,vocab,d_model=512,nhead=8,nlayers=6):
-        super().__init__(); self.enc=CNNEncoder(d_model); self.dec=TransformerDecoder(vocab,d_model,nhead,nlayers)
-    def forward(self,x,y_in):
-        mem=self.enc(x); return self.dec(y_in,mem)
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, dropout=0.1, max_len=5000):
+        super().__init__()
+        self.dropout = nn.Dropout(p=dropout)
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(1)
+        self.register_buffer("pe", pe)
+    def forward(self, x):
+        x = x + self.pe[:x.size(0)]
+        return self.dropout(x)
 
-def cross_entropy_smoothed(logits,y_out,pad_id=0,eps=0.1):
+class Im2Latex(nn.Module):
+    def __init__(self, vocab_size, d_model=768, nhead=12, nlayers=8,
+                 dim_feedforward=3072, dropout=0.1, pad_id=3):
+        super().__init__()
+        self.pad_id = pad_id
+        self.embed = nn.Embedding(vocab_size, d_model)
+        self.posenc = PositionalEncoding(d_model, dropout=dropout)
+        self.transformer = nn.TransformerDecoder(
+            nn.TransformerDecoderLayer(
+                d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout,
+            ),
+            num_layers=nlayers
+        )
+        self.out = nn.Linear(d_model, vocab_size, bias=False)
+        # Weight tying improves perplexity and regularizes the softmax
+        self.out.weight = self.embed.weight
+    def forward(self, x, y_in):
+        mem = CNNEncoder(d_model=self.embed.embedding_dim)(x)
+        y = self.embed(y_in).transpose(0,1)
+        y = self.posenc(y)
+        mask = nn.Transformer.generate_square_subsequent_mask(y.size(0)).to(y_in.device)
+        h = self.transformer(y, mem, tgt_mask=mask)
+        return self.out(h).transpose(0,1)
+
+def cross_entropy_smoothed(logits,y_out,pad_id=3,eps=0.1):
     V=logits.size(-1); logp=logits.log_softmax(-1)
     y=y_out.reshape(-1); lp=logp.reshape(-1,V)
     mask=(y!=pad_id).float()

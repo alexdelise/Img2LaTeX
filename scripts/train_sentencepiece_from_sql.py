@@ -19,15 +19,21 @@ def main():
             f.write(latex + "\n")
     con.close()
 
+    out_prefix = str(out/"latex_sp")
+
     spm.SentencePieceTrainer.Train(
         input=str(corpus),
-        model_prefix=str(out/"latex_sp"),
-        vocab_size=args.vocab_size,
-        model_type="bpe",
-        character_coverage=1.0,
-        user_defined_symbols=["{","}","^","_","\\left","\\right","\\frac","\\sqrt"],
-        bos_id=1, eos_id=2, pad_id=-1,  # disable auto pad
-        unk_id=0
+        model_prefix=out_prefix,
+        vocab_size=args.vocab_size,                 # set via CLI (see below)
+        character_coverage=1.0,                     # keep all LaTeX glyphs
+        # Keep frequent LaTeX tokens atomic so they don't fragment into UNKs
+        user_defined_symbols=[
+            "{","}","[","]","(",")","^","_",
+            "\\left","\\right","\\frac","\\sqrt","\\mathrm","\\operatorname",
+            "\\int","\\sum","\\prod","\\delta","\\epsilon","\\infty","\\pi",
+            "\\sin","\\cos","\\tan","\\log","\\exp","\\cdot","\\,"
+        ],
+        bos_id=1, eos_id=2, pad_id=3, unk_id=0      # reserve PAD=3
     )
     print("[ok] tokenizer:", out/"latex_sp.model")
 

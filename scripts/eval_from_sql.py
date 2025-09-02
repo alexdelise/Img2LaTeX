@@ -16,6 +16,9 @@ def beam_search(model, x, bos_id=1, eos_id=2, beam=5, max_len=256, alpha=0.8):
             y = torch.tensor([seq], device=device)
             logits = model.dec(y, mem)[:, -1]
             logp = torch.log_softmax(logits, -1).squeeze(0)
+            # Suppress <unk>=0 and PAD=3 during generation
+            logp[0] = float("-inf")
+            logp[3] = float("-inf")
             vals, idx = torch.topk(logp, beam)
             for v, i in zip(vals.tolist(), idx.tolist()):
                 cand.append((seq + [i], lp + v))

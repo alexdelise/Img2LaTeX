@@ -33,6 +33,9 @@ class LatexTokenizer:
         self.sp = spm.SentencePieceProcessor()
         self.sp.load(spm_model)
         self.bos_id, self.eos_id, self.pad_id = bos_id, eos_id, pad_id
+        pid = self.sp.pad_id()
+        if pid >= 0:
+            assert pid == self.pad_id, f"SPM pad_id={pid} but code expects pad_id={self.pad_id}"
 
     def encode(self, s, add_bos=True, add_eos=True):
         ids = self.sp.encode(s, out_type=int)
@@ -46,8 +49,8 @@ class LatexTokenizer:
 
     @property
     def vocab_size(self):
-        # +1 for manual PAD token
-        return self.sp.get_piece_size() + 1
+        # SPM vocab already includes PAD
+        return self.sp.get_piece_size()
 
 # ----------------------------
 # Dataset from SQLite
